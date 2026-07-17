@@ -98,7 +98,7 @@ int CShotgun::GetItemInfo( ItemInfo *p )
 	p->iMaxAmmo1 = BUCKSHOT_MAX_CARRY;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
-	p->iMaxClip = BUCKSHOT_MAX_CARRY;// SHOTGUN_MAX_CLIP;
+	p->iMaxClip = BUCKSHOT_MAX_CARRY;
 	p->iSlot = 2;
 	p->iPosition = 1;
 	p->iFlags = 0;

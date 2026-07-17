@@ -22,58 +22,13 @@
 #include "gamerules.h"
 #include "rf_viewmodel.h"
 #include "rf_player.h"
+#include "rf_weaponbase.h"
 
 // this file hosts all the weapon base classes
 // the overall tf2 weapon, the guns, and the melee classes
 // this file does NOT host the actual weapons themselves. those go in their respective files
 
 // ------------------------------------------------ SHARED BASE ----------------------------------------------------- //
-
-enum viewmodel_e
-{
-	PRIMARY_DRAW,
-	PRIMARY_IDLE,
-	PRIMARY_FIRE,
-	PRIMARY_RELOAD,
-	PRIMARY_RELOAD_START,
-	PRIMARY_RELOAD_END,
-
-	SECONDARY_DRAW,
-	SECONDARY_IDLE,
-	SECONDARY_FIRE,
-	SECONDARY_RELOAD,
-	SECONDARY_RELOAD_START,
-	SECONDARY_RELOAD_END,
-
-	MELEE_DRAW,
-	MELEE_IDLE,
-	MELEE_SWING_A,
-	MELEE_SWING_B,
-	MELEE_SWING_CRIT,
-
-	ITEM1_DRAW,
-	ITEM1_IDLE,
-
-	ITEM2_DRAW,
-	ITEM2_IDLE,
-
-	LAST_ENUM_ANIM
-};
-// todo: make a function that first looks for the sequences with a string before using the index numbers directly
-// ex: look for "primary_shoot" or "primary_fire" first. if those sequences exist, use the index they are in. if they do not, then default to using the index enum number
-// would allow flexibility with creating viewemodels
-
-enum ViewAnimState
-{
-	ATTACK,
-	ATTACK_ALT,	// example of why i make FindSequenceViewmodel use a case rather than just a hardcoded things, as some unlocks use seperate viewmodel anims
-	FIRE,
-	RELOAD,
-	RELOAD_START,
-	RELOAD_END,
-	IDLE,
-	DRAW
-};
 
 inline int FindSequenceViewmodel(int slot, int state)
 {
@@ -188,8 +143,12 @@ BOOL CRFBasePlayerGun::GetItemInfo(ItemInfo* p)
 
 	p->pszAmmo1 = NULL;
 	p->iMaxAmmo1 = -1;
+	// when u press m1
+
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
+	// when u press m2
+	
 	p->iMaxClip = WEAPON_NOCLIP;
 	p->iSlot = 0;
 	p->iPosition = 0;
