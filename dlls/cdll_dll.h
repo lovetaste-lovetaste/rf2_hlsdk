@@ -41,5 +41,5 @@
 #define HUD_PRINTCENTER		4
 
 
-#define WEAPON_SUIT		31
+#define WEAPON_SUIT 31
 #endif

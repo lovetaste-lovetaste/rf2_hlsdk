@@ -17,6 +17,7 @@
 #include "util.h"
 #include "game.h"
 #include "vcs_info.h"
+#include "bot/hl_bot_manager.h"	// bot framework (dlls/bot) - cvar registration and manager creation
 
 static cvar_t build_commit = { "sv_game_build_commit", g_VCSInfo_Commit };
 static cvar_t build_branch = { "sv_game_build_branch", g_VCSInfo_Branch };
@@ -51,7 +52,7 @@ cvar_t defaultteam	= { "mp_defaultteam","0" };
 cvar_t allowmonsters	= { "mp_allowmonsters","0", FCVAR_SERVER };
 cvar_t bhopcap		= { "mp_bhopcap", "1", FCVAR_SERVER };
 
-cvar_t allow_spectators = { "allow_spectators", "0", FCVAR_SERVER };	// 0 prevents players from being spectators
+cvar_t allow_spectators = { "allow_spectators", "1", FCVAR_SERVER };	// 0 prevents players from being spectators
 cvar_t multibyte_only = { "mp_multibyte_only", "0", FCVAR_SERVER };
 
 cvar_t mp_chattime	= { "mp_chattime","10", FCVAR_SERVER };
@@ -467,6 +468,10 @@ cvar_t sv_busters = { "sv_busters", "0" };
 // This gets called one time when the game is initialied
 void GameDLLInit( void )
 {
+	// bot/nav cvars and the "bot_*" server commands
+	Bot_RegisterCvars();
+	InstallBotControl();
+
 	g_psv_gravity = CVAR_GET_POINTER( "sv_gravity" );
 	g_psv_aim = CVAR_GET_POINTER( "sv_aim" );
 	g_psv_allow_autoaim = CVAR_GET_POINTER( "sv_allow_autoaim" );

@@ -43,6 +43,7 @@ CGlobalState					gGlobalState;
 extern DLL_GLOBAL int				gDisplayTitle;
 
 extern void W_Precache( void );
+extern void BotPrecache( void );	// bot framework assets (dlls/bot/bot_util.cpp)
 
 //
 // This must match the list in util.h
@@ -503,6 +504,8 @@ void CWorld::Precache( void )
 	W_Precache();				// get weapon precaches
 
 	ClientPrecache();
+
+	BotPrecache();				// nav editing beam sprite + UI sounds (dlls/bot)
 
 	// sounds used from C physics code
 	PRECACHE_SOUND( "common/null.wav" );// clears sound channels

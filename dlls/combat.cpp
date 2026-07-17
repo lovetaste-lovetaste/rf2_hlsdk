@@ -359,6 +359,7 @@ Activity CBaseMonster::GetDeathActivity( void )
 		}
 		else if( flDot <= -0.3f )
 		{
+			// todo: do backstab check here if killed by knife
 			deathActivity = ACT_DIEBACKWARD;
 		}
 		break;
@@ -372,6 +373,7 @@ Activity CBaseMonster::GetDeathActivity( void )
 		}
 		else if( flDot <= -0.3f )
 		{
+			// todo: do backstab check here if killed by knife
 			deathActivity = ACT_DIEBACKWARD;
 		}
 		break;

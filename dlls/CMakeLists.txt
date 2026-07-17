@@ -48,6 +48,16 @@ set (SVDLL_SOURCES
 	agrunt.cpp
 	airtank.cpp
 	aflock.cpp
+	bot/airstrafe.cpp
+	bot/bot_phrases.cpp
+	bot/bot_util.cpp
+	bot/hl_bot.cpp
+	bot/hl_bot_manager.cpp
+	bot/nav_area.cpp
+	bot/nav_file.cpp
+	bot/nav_node.cpp
+	bot/nav_path.cpp
+	bot/shared_util.cpp
 	animating.cpp
 	animation.cpp
 	apache.cpp
@@ -115,6 +125,7 @@ set (SVDLL_SOURCES
 	plats.cpp
 	player.cpp
 	playermonster.cpp
+	rooster/rf_player.cpp
 	python.cpp
 	rat.cpp
 	roach.cpp
@@ -165,7 +176,7 @@ else()
 		../external/openbsd/strlcat.c)
 endif()
 
-include_directories (. wpn_shared ../common ../engine ../pm_shared ../game_shared ../public)
+include_directories (. rooster wpn_shared ../common ../engine ../pm_shared ../game_shared ../public)
 
 if(MSVC)
 	set(SVDLL_SOURCES

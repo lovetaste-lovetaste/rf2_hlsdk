@@ -69,6 +69,8 @@ void EV_HornetGunFire( struct event_args_s *args );
 void EV_TripmineFire( struct event_args_s *args );
 void EV_SnarkFire( struct event_args_s *args );
 
+void EV_FireTFGun(struct event_args_s* args);
+
 void EV_TrainPitchAdjust( struct event_args_s *args );
 void EV_VehiclePitchAdjust( event_args_t *args );
 }
@@ -1812,6 +1814,81 @@ void EV_VehiclePitchAdjust( event_args_t *args )
 	{
 		gEngfuncs.pEventAPI->EV_PlaySound( idx, origin, CHAN_STATIC, pszSound, m_flVolume, ATTN_NORM, SND_CHANGE_PITCH, pitch );
 	}
+}
+
+// Rooster Fortress shared event
+// i DO NOT LIKE creating all those shitty files, so this is an attempt to consolidate them into as little events as possible
+// considering most of this shit is cosmetic anyway it should be fine
+// however, it is important for viewmodels in particular, which is why the c_viewmodel system really works in this part considering all the viewmodels follow the same index
+// stolen from the glock again #cage
+
+// for weapon sounds to play, make sure to put it in here and make sure to put args.iparam1 as the index of the weapon fire sound
+// ALL SOUNDS MUST BE IN sound/rooster_fortress/* FOR THEM TO BE TRIGGERED, AS THE SOUND SELECTION AUTOMATICALLY ASSUMES SO
+
+static const char* tf_weaponSounds[] =
+{
+	"pistol_shoot",
+	"scattergun_shoot",
+	"shotgun_shoot",
+	NULL
+};
+
+// for weapon animations to show up, make sure to put args.iparams2 as the slot it is in
+// 0 = Primary, 1 = Secondary, 2 = Melee
+// the fire animations must be in the 2nd / 8th / 14th animation index respectively, otherwise it won't show up
+
+// for the recoil to show up, use args.bparams1
+
+void EV_FireTFGun(event_args_t* args)
+{
+	int idx;
+	vec3_t origin;
+	vec3_t angles;
+	vec3_t velocity;
+
+	vec3_t ShellVelocity;
+	vec3_t ShellOrigin;
+	int shell;
+	vec3_t vecSrc, vecAiming;
+	vec3_t up, right, forward;
+
+	idx = args->entindex;
+	VectorCopy(args->origin, origin);
+	VectorCopy(args->angles, angles);
+	VectorCopy(args->velocity, velocity);
+
+	AngleVectors(angles, forward, right, up);
+
+	char sound[512] = "rooster_fortress/weapons/";
+	strcat(sound, tf_weaponSounds[args->iparam1]);
+
+	/*
+		// if crit then append crit underscore
+		todo, not implemented yet
+	*/
+
+	shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/shell.mdl");// brass shell
+
+	if (EV_IsLocal(idx))
+	{
+		EV_MuzzleFlash();
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(2 + (6 * args->iparam2), 0);
+
+		if(args->bparam1 == 1)
+			V_PunchAxis(0, -2.0);
+	}
+
+	EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20, -12, 4);
+
+	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL);
+
+	gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, sound, gEngfuncs.pfnRandomFloat(0.92, 1.0), ATTN_NORM, 0, 98 + gEngfuncs.pfnRandomLong(0, 3));
+
+	EV_GetGunPosition(args, vecSrc, origin);
+
+	VectorCopy(forward, vecAiming);
+
+	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_9MM, 0, &g_tracerCount[idx - 1], args->fparam1, args->fparam2);
 }
 
 int EV_TFC_IsAllyTeam( int iTeam1, int iTeam2 )

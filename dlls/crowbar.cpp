@@ -291,7 +291,7 @@ int CCrowbar::Swing( int fFirst )
 				if( !pEntity->IsAlive() )
 				{
 #if CROWBAR_FIX_RAPID_CROWBAR
-					m_flNextPrimaryAttack = GetNextAttackDelay(0.25);
+					m_flNextPrimaryAttack = GetNextAttackDelay(0.1);
 #endif
 					return TRUE;
 				}
@@ -338,9 +338,9 @@ int CCrowbar::Swing( int fFirst )
 		pev->nextthink = gpGlobals->time + 0.2f;
 #endif
 #if CROWBAR_DELAY_FIX
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.25f;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.1f;
 #else
-		m_flNextPrimaryAttack = GetNextAttackDelay( 0.25f );
+		m_flNextPrimaryAttack = GetNextAttackDelay( 0.1f );
 #endif
 	}
 #if CROWBAR_IDLE_ANIM

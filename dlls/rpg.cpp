@@ -160,7 +160,7 @@ void CRpgRocket::Spawn( void )
 	pev->velocity = gpGlobals->v_forward * 250.0f;
 	pev->gravity = 0.5f;
 
-	pev->nextthink = gpGlobals->time + 0.4f;
+	pev->nextthink = gpGlobals->time + 0.01f;
 
 	pev->dmg = gSkillData.plrDmgRPG;
 }
@@ -197,7 +197,7 @@ void CRpgRocket::IgniteThink( void )
 	pev->effects |= EF_LIGHT;
 
 	// make rocket sound
-	EMIT_SOUND( ENT( pev ), CHAN_VOICE, "weapons/rocket1.wav", 1, 0.5f );
+	EMIT_SOUND( ENT( pev ), CHAN_VOICE, "weapons/rocket1.wav", 0.25, 0.5f );
 
 	// rocket trail
 	MESSAGE_BEGIN( MSG_BROADCAST, SVC_TEMPENTITY );
@@ -205,7 +205,7 @@ void CRpgRocket::IgniteThink( void )
 		WRITE_SHORT( entindex() );	// entity
 		WRITE_SHORT( m_iTrail );	// model
 		WRITE_BYTE( 40 ); // life
-		WRITE_BYTE( 5 );  // width
+		WRITE_BYTE( 2 );  // width
 		WRITE_BYTE( 224 );   // r, g, b
 		WRITE_BYTE( 224 );   // r, g, b
 		WRITE_BYTE( 255 );   // r, g, b

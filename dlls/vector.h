@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   Use, distribution, and modification of this source code and/or resulting
@@ -17,7 +17,7 @@
 #define VECTOR_H
 
 //=========================================================
-// 2DVector - used for many pathfinding and many other 
+// 2DVector - used for many pathfinding and many other
 // operations that are treated as planar rather than 3d.
 //=========================================================
 class Vector2D
@@ -31,6 +31,28 @@ public:
 	inline Vector2D operator/(float fl)		const	{ return Vector2D( x / fl, y / fl );	}
 
 	inline float Length(void)			const	{ return sqrt(x * x + y * y );		}
+	inline float LengthSquared( void )		const	{ return x * x + y * y;			}
+
+	// Cheap length comparisons (no sqrt) - used by the bot/nav code
+	inline bool IsLengthLessThan( float length ) const	{ return LengthSquared() < length * length; }
+	inline bool IsLengthGreaterThan( float length ) const	{ return LengthSquared() > length * length; }
+
+	// Normalize this vector in place; returns its length before normalization.
+	inline float NormalizeInPlace( void )
+	{
+		const float flLen = Length();
+		if( flLen == 0 )
+		{
+			x = 0;
+			y = 0;
+			return 0;
+		}
+
+		const float flInv = 1 / flLen;
+		x *= flInv;
+		y *= flInv;
+		return flLen;
+	}
 
 	inline Vector2D Normalize ( void ) const
 	{
@@ -65,7 +87,7 @@ public:
 	inline Vector( float X, float Y, float Z ): x( 0.0f ), y( 0.0f ), z( 0.0f )	{ x = X; y = Y; z = Z;				}
 	//inline Vector( double X, double Y, double Z )		{ x = (float)X; y = (float)Y; z = (float)Z;	}
 	//inline Vector( int X, int Y, int Z )			{ x = (float)X; y = (float)Y; z = (float)Z;	}
-	inline Vector( const Vector& v ): x( 0.0f ), y( 0.0f ), z( 0.0f )	{ x = v.x; y = v.y; z = v.z;			} 
+	inline Vector( const Vector& v ): x( 0.0f ), y( 0.0f ), z( 0.0f )	{ x = v.x; y = v.y; z = v.z;			}
 	inline Vector( float rgfl[3] ): x( 0.0f ), y( 0.0f ), z( 0.0f )	{ x = rgfl[0]; y = rgfl[1]; z = rgfl[2];	}
 
 	// Operators
@@ -80,6 +102,32 @@ public:
 	// Methods
 	inline void CopyToArray( float* rgfl ) const		{ rgfl[0] = x, rgfl[1] = y, rgfl[2] = z; }
 	inline float Length( void ) const					{ return sqrt( x * x + y * y + z * z ); }
+	inline float LengthSquared( void ) const			{ return x * x + y * y + z * z; }
+
+	// Cheap length comparisons (no sqrt) - used by the bot/nav code
+	inline bool IsLengthLessThan( float length ) const		{ return LengthSquared() < length * length; }
+	inline bool IsLengthGreaterThan( float length ) const	{ return LengthSquared() > length * length; }
+
+	// Normalize this vector in place; returns its length before normalization.
+	// (Normalize() below returns a copy - the bot/nav code wants in-place.)
+	inline float NormalizeInPlace( void )
+	{
+		const float flLen = Length();
+		if( flLen == 0 )
+		{
+			x = 0;
+			y = 0;
+			z = 1;
+			return 0;
+		}
+
+		const float flInv = 1 / flLen;
+		x *= flInv;
+		y *= flInv;
+		z *= flInv;
+		return flLen;
+	}
+
 	operator float *()								{ return &x; } // Vectors will now automatically convert to float * when needed
 	operator const float *() const					{ return &x; } // Vectors will now automatically convert to float * when needed
 	inline Vector Normalize( void ) const

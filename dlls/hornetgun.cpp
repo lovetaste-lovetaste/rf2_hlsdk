@@ -93,7 +93,7 @@ int CHgun::GetItemInfo( ItemInfo *p )
 {
 	p->pszName = STRING( pev->classname );
 	p->pszAmmo1 = "Hornets";
-	p->iMaxAmmo1 = HORNET_MAX_CARRY;
+	p->iMaxAmmo1 = 100;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = WEAPON_NOCLIP;
@@ -140,7 +140,7 @@ void CHgun::PrimaryAttack()
 	float flRechargeTimePause = 0.5f;
 
 	if( g_pGameRules->IsMultiplayer() )
-		flRechargeTimePause = 0.3f;
+		flRechargeTimePause = 0.01f;
 
 	m_flRechargeTime = gpGlobals->time + flRechargeTimePause;
 #endif
@@ -160,11 +160,11 @@ void CHgun::PrimaryAttack()
 	// player "shoot" animation
 	m_pPlayer->SetAnimation( PLAYER_ATTACK1 );
 
-	m_flNextPrimaryAttack = m_flNextPrimaryAttack + 0.25f;
+	m_flNextPrimaryAttack = m_flNextPrimaryAttack + 0.05f;
 
 	if( m_flNextPrimaryAttack < UTIL_WeaponTimeBase() )
 	{
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.25f;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.05f;
 	}
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat( m_pPlayer->random_seed, 10, 15 );
@@ -251,24 +251,24 @@ void CHgun::SecondaryAttack( void )
 	// player "shoot" animation
 	m_pPlayer->SetAnimation( PLAYER_ATTACK1 );
 
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.1f;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.01f;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat( m_pPlayer->random_seed, 10.0f, 15.0f );
 }
 
-void CHgun::Reload( void )
+void CHgun::Reload(void)
 {
-	if( m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= HORNET_MAX_CARRY )
+	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= HORNET_MAX_CARRY)
 		return;
 
-	while( m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < HORNET_MAX_CARRY && m_flRechargeTime < gpGlobals->time )
+	while (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < HORNET_MAX_CARRY && m_flRechargeTime < gpGlobals->time)
 	{
 		float flRechargeTimePause = 0.5f;
 #if CLIENT_DLL
-		if( bIsMultiplayer() )
+		if (bIsMultiplayer())
 #else
-		if( g_pGameRules->IsMultiplayer() )
+		if (g_pGameRules->IsMultiplayer())
 #endif
-			flRechargeTimePause = 0.3f;
+			flRechargeTimePause = 0.25f;
 
 		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
 		m_flRechargeTime += flRechargeTimePause;

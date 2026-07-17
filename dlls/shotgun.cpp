@@ -98,7 +98,7 @@ int CShotgun::GetItemInfo( ItemInfo *p )
 	p->iMaxAmmo1 = BUCKSHOT_MAX_CARRY;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
-	p->iMaxClip = SHOTGUN_MAX_CLIP;
+	p->iMaxClip = BUCKSHOT_MAX_CARRY;// SHOTGUN_MAX_CLIP;
 	p->iSlot = 2;
 	p->iPosition = 1;
 	p->iFlags = 0;
@@ -158,7 +158,7 @@ void CShotgun::PrimaryAttack()
 	if( g_pGameRules->IsMultiplayer() )
 #endif
 	{
-		vecDir = m_pPlayer->FireBulletsPlayer( 4, vecSrc, vecAiming, VECTOR_CONE_DM_SHOTGUN, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed );
+		vecDir = m_pPlayer->FireBulletsPlayer( 4, vecSrc, vecAiming, Vector(0.0, 0.0, 0.00), 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed );
 	}
 	else
 	{
@@ -175,12 +175,12 @@ void CShotgun::PrimaryAttack()
 	//if( m_iClip != 0 )
 		m_flPumpTime = gpGlobals->time + 0.5f;
 
-	m_flNextPrimaryAttack = GetNextAttackDelay( 0.75f );
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.75f;
+	m_flNextPrimaryAttack = GetNextAttackDelay( 0.25f );
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.25f;
 	if( m_iClip != 0 )
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 5.0f;
 	else
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.75f;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.25f;
 	m_fInSpecialReload = 0;
 }
 
@@ -221,7 +221,7 @@ void CShotgun::SecondaryAttack( void )
 	Vector vecAiming = m_pPlayer->GetAutoaimVector( AUTOAIM_5DEGREES );
 
 	Vector vecDir;
-
+	
 #if CLIENT_DLL
 	if( bIsMultiplayer() )
 #else
@@ -236,8 +236,12 @@ void CShotgun::SecondaryAttack( void )
 		// untouched default single player
 		vecDir = m_pPlayer->FireBulletsPlayer( 12, vecSrc, vecAiming, VECTOR_CONE_10DEGREES, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed );
 	}
+	
+	// CGrenade::ShootContact(m_pPlayer->pev,
+		//m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16.0f,
+		//gpGlobals->v_forward * 500.0f);
 
-	PLAYBACK_EVENT_FULL( flags, m_pPlayer->edict(), m_usDoubleFire, 0.0f, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0 );
+	PLAYBACK_EVENT_FULL( flags, m_pPlayer->edict(), m_usDoubleFire, 0.0f, g_vecZero, g_vecZero, vecAiming.x, vecAiming.y, 0, 0, 0, 0 );
 
 	if( !m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0 )
 		// HEV suit - indicate out of ammo condition
@@ -246,19 +250,19 @@ void CShotgun::SecondaryAttack( void )
 	//if( m_iClip != 0 )
 		m_flPumpTime = gpGlobals->time + 0.95f;
 
-	m_flNextPrimaryAttack = GetNextAttackDelay( 1.5f );
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.5f;
+	m_flNextPrimaryAttack = GetNextAttackDelay( 1.0f );
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.01f;
 	if( m_iClip != 0 )
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 6.0f;
 	else
-		m_flTimeWeaponIdle = 1.5;
+		m_flTimeWeaponIdle = 0.1;
 
 	m_fInSpecialReload = 0;
 }
 
 void CShotgun::Reload( void )
 {
-	if( m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0 || m_iClip == SHOTGUN_MAX_CLIP )
+	if( m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0 || m_iClip >= SHOTGUN_MAX_CLIP )
 		return;
 
 	// don't reload until recoil is done
@@ -290,7 +294,7 @@ void CShotgun::Reload( void )
 
 		SendWeaponAnim( SHOTGUN_RELOAD );
 
-		m_flNextReload = UTIL_WeaponTimeBase() + 0.5f;
+		m_flNextReload = UTIL_WeaponTimeBase() + 0.01f;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5f;
 	}
 	else

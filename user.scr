@@ -1,0 +1,147 @@
+// ============================================================================
+//  user.scr  -  Rooster Fortress user options menu (Xash3D FWGS)
+// ----------------------------------------------------------------------------
+//  Parsed by the FWGS menu (CSCR_LoadDefaultCVars) and surfaced as the
+//  scripted user-options page. Reach it in-game via:
+//      Main menu > Configuration > Customize (Player Setup) > "Game options"
+//  The "Game options" button is GRAYED OUT unless this file is found in the
+//  active game dir AND parses into at least one cvar. (Note: the "Adv.
+//  Options" button next to it is the engine's hardcoded netcode page, NOT
+//  this one.)
+//
+//  Each block maps a CLIENT cvar to a UI control. Server cvars belong in
+//  settings.scr (the Create Server > Game dialog) instead.
+//
+//  DEPLOYMENT: place this file in the active mod/game folder root, next to
+//  gameinfo.txt / liblist.gam (e.g. <Xash>/rooster_fortress/user.scr), then
+//  RESTART the engine (the menu loads .scr files once at init). It is
+//  content, not code, so it is not built by CMake.
+//
+//  VERIFY: set "developer 2" in console and restart; you should see
+//  "Reading config script file user.scr" and no "Parse error in user.scr".
+//
+//  Control types:
+//    BOOL                     yes/no toggle              default "0" or "1"
+//    NUMBER   min max         numeric, -1 -1 = no limit  default "value"
+//    LIST     "label" "index" dropdown                   default "index"
+//  LIST indices MUST be consecutive integers starting at 0.
+// ============================================================================
+
+VERSION 1.0
+
+DESCRIPTION INFO_OPTIONS
+{
+	// ---------------------------------------------------------------- View & FOV
+	"default_fov"
+	{
+		"Field of view"
+		{ NUMBER 75.000000 130.000000 }
+		{ "90.000000" }
+	}
+
+	"zoom_sensitivity_ratio"
+	{
+		"Zoomed mouse sensitivity ratio"
+		{ NUMBER 0.000000 3.000000 }
+		{ "1.200000" }
+	}
+
+	"cl_viewbob"
+	{
+		"View bobbing"
+		{ BOOL }
+		{ "1.000000" }
+	}
+
+	// -------------------------------------------------- TF / HUD gameplay toggles
+	"hud_classautokill"
+	{
+		"Instantly respawn after changing class"
+		{ BOOL }
+		{ "1.000000" }
+	}
+
+	"cl_autowepswitch"
+	{
+		"Automatically switch to picked-up weapons"
+		{ BOOL }
+		{ "1.000000" }
+	}
+
+	"hud_fastswitch"
+	{
+		"Fast weapon switch (no confirm key)"
+		{ BOOL }
+		{ "0.000000" }
+	}
+
+	"hud_centerid"
+	{
+		"Center player-ID target names on screen"
+		{ BOOL }
+		{ "0.000000" }
+	}
+
+	"hud_takesshots"
+	{
+		"Auto-screenshot the scoreboard each round"
+		{ BOOL }
+		{ "0.000000" }
+	}
+
+	// -------------------------------------------------------------- Voice & chat
+	"voice_modenable"
+	{
+		"Enable in-game voice"
+		{ BOOL }
+		{ "1.000000" }
+	}
+
+	"hud_saytext"
+	{
+		"Show text chat messages"
+		{ BOOL }
+		{ "1.000000" }
+	}
+
+	"hud_saytext_time"
+	{
+		"Chat message on-screen time (seconds)"
+		{ NUMBER 0.000000 30.000000 }
+		{ "5.000000" }
+	}
+
+	// ------------------------------------------------------------- Misc. client
+	"cl_scoreboard_bg"
+	{
+		"Draw scoreboard background"
+		{ BOOL }
+		{ "1.000000" }
+	}
+
+	"cl_showpacketloss"
+	{
+		"Show packet loss on the scoreboard"
+		{ BOOL }
+		{ "0.000000" }
+	}
+
+	"cl_laddermode"
+	{
+		"Ladder movement style"
+		{
+			LIST
+			"Classic (strafe)"	"0"
+			"Aim to climb"		"1"
+			"Free look"		"2"
+		}
+		{ "2.000000" }
+	}
+
+	"hud_allow_hd"
+	{
+		"Allow HD models and content"
+		{ BOOL }
+		{ "1.000000" }
+	}
+}

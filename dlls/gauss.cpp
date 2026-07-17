@@ -52,7 +52,7 @@ float CGauss::GetFullChargeTime( void )
 	if( g_pGameRules->IsMultiplayer() )
 #endif
 	{
-		return 1.5f;
+		return 2.0f;
 	}
 
 	return 4.0f;
@@ -159,13 +159,14 @@ void CGauss::PrimaryAttack()
 
 	m_pPlayer->m_iWeaponVolume = GAUSS_PRIMARY_FIRE_VOLUME;
 	m_fPrimaryFire = TRUE;
-
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 2;
+	
+	//if( RANDOM_LONG(0,2) == 1 )
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 1;
 
 	StartFire();
 	m_fInAttack = 0;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0f;
-	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.2f;
+	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.1f;
 }
 
 void CGauss::SecondaryAttack()
@@ -336,7 +337,7 @@ void CGauss::StartFire( void )
 	{
 		// fixed damage on primary attack
 #if CLIENT_DLL
-		flDamage = 20.0f;
+		flDamage = 2.0f;
 #else 
 		flDamage = gSkillData.plrDmgGauss;
 #endif

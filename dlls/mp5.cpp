@@ -100,7 +100,7 @@ int CMP5::GetItemInfo( ItemInfo *p )
 	p->iMaxAmmo1 = _9MM_MAX_CARRY;
 	p->pszAmmo2 = "ARgrenades";
 	p->iMaxAmmo2 = M203_GRENADE_MAX_CARRY;
-	p->iMaxClip = MP5_MAX_CLIP;
+	p->iMaxClip = _9MM_MAX_CARRY;
 	p->iSlot = 2;
 	p->iPosition = 0;
 	p->iFlags = 0;
@@ -140,7 +140,7 @@ void CMP5::PrimaryAttack()
 	if( m_iClip <= 0 )
 	{
 		PlayEmptySound();
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.15f;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.05f;
 		return;
 	}
 
@@ -164,12 +164,12 @@ void CMP5::PrimaryAttack()
 #endif
 	{
 		// optimized multiplayer. Widened to make it easier to hit a moving player
-		vecDir = m_pPlayer->FireBulletsPlayer( 1, vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed );
+		vecDir = m_pPlayer->FireBulletsPlayer( 1, vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 2, 5, m_pPlayer->pev, m_pPlayer->random_seed );
 	}
 	else
 	{
 		// single player spread
-		vecDir = m_pPlayer->FireBulletsPlayer( 1, vecSrc, vecAiming, VECTOR_CONE_3DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed );
+		vecDir = m_pPlayer->FireBulletsPlayer( 1, vecSrc, vecAiming, VECTOR_CONE_3DEGREES, 8192, BULLET_PLAYER_MP5, 2, 5, m_pPlayer->pev, m_pPlayer->random_seed );
 	}
 
 	int flags;
@@ -184,10 +184,10 @@ void CMP5::PrimaryAttack()
 		// HEV suit - indicate out of ammo condition
 		m_pPlayer->SetSuitUpdate( "!HEV_AMO0", FALSE, 0 );
 
-	m_flNextPrimaryAttack = GetNextAttackDelay( 0.1f );
+	m_flNextPrimaryAttack = GetNextAttackDelay( 0.01f );
 
 	if( m_flNextPrimaryAttack < UTIL_WeaponTimeBase() )
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.1f;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.01f;
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat( m_pPlayer->random_seed, 10, 15 );
 }
@@ -221,11 +221,16 @@ void CMP5::SecondaryAttack( void )
 
  	UTIL_MakeVectors( m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle );
 
-	// we don't add in player velocity anymore.
-	CGrenade::ShootContact( m_pPlayer->pev,
-					m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16.0f,
-					gpGlobals->v_forward * 800.0f );
-
+	//for( int i = 1; i < 5; i++)
+	//{
+		
+		// we don't add in player velocity anymore.
+		// clustergrenade
+		CGrenade::ShootContact(m_pPlayer->pev,
+			m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16.0f,
+			gpGlobals->v_forward * 500.0f);
+	//}
+	
 	int flags;
 #if CLIENT_WEAPONS
 	flags = FEV_NOTHOST;
@@ -235,7 +240,7 @@ void CMP5::SecondaryAttack( void )
 	PLAYBACK_EVENT( flags, m_pPlayer->edict(), m_usMP52 );
 
 	m_flNextPrimaryAttack = GetNextAttackDelay( 1.0f );
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0f;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.1f;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 5.0f;// idle pretty soon after shooting.
 
 	if( !m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] )

@@ -232,7 +232,7 @@ void CSqueakGrenade::HuntThink( void )
 	}
 	else if( pev->movetype == MOVETYPE_FLY )
 	{
-		pev->movetype = MOVETYPE_BOUNCE;
+		pev->movetype =	MOVETYPE_BOUNCE;
 	}
 
 	// return if not time to hunt
@@ -352,14 +352,14 @@ void CSqueakGrenade::SuperBounceTouch( CBaseEntity *pOther )
 			{
 				// ALERT( at_console, "hit enemy\n" );
 				ClearMultiDamage();
-				pOther->TraceAttack( pev, gSkillData.snarkDmgBite, gpGlobals->v_forward, &tr, DMG_SLASH ); 
+				pOther->TraceAttack( pev, 10.0, gpGlobals->v_forward, &tr, DMG_SLASH ); 
 				if( m_hOwner != 0 )
 					ApplyMultiDamage( pev, m_hOwner->pev );
 				else
 					ApplyMultiDamage( pev, pev );
 
 				pev->dmg += gSkillData.snarkDmgPop; // add more explosion damage
-				// m_flDie += 2.0f; // add more life
+				m_flDie = 0.0; // add more life
 
 				// make bite sound
 				EMIT_SOUND_DYN( ENT( pev ), CHAN_WEAPON, "squeek/sqk_deploy1.wav", 1.0f, ATTN_NORM, 0, (int)flpitch );

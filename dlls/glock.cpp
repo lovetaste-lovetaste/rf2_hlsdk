@@ -106,12 +106,12 @@ BOOL CGlock::Deploy()
 
 void CGlock::SecondaryAttack( void )
 {
-	GlockFire( 0.1f, 0.2f, FALSE );
+	GlockFire( 0.0f, 1.0f, FALSE );
 }
 
 void CGlock::PrimaryAttack( void )
 {
-	GlockFire( 0.01f, 0.3f, TRUE );
+	GlockFire( 0.1f, 0.1f, TRUE );
 }
 
 void CGlock::GlockFire( float flSpread, float flCycleTime, BOOL fUseAutoAim )
@@ -121,7 +121,7 @@ void CGlock::GlockFire( float flSpread, float flCycleTime, BOOL fUseAutoAim )
 		if( m_fFireOnEmpty )
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = GetNextAttackDelay( 0.2f );
+			m_flNextPrimaryAttack = GetNextAttackDelay(flCycleTime);
 		}
 
 		return;
@@ -166,7 +166,7 @@ void CGlock::GlockFire( float flSpread, float flCycleTime, BOOL fUseAutoAim )
 	}
 
 	Vector vecDir;
-	vecDir = m_pPlayer->FireBulletsPlayer( 1, vecSrc, vecAiming, Vector( flSpread, flSpread, flSpread ), 8192, BULLET_PLAYER_9MM, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed );
+	vecDir = m_pPlayer->FireBulletsPlayer( 1, vecSrc, vecAiming, Vector( flSpread, flSpread, flSpread ), 8192, BULLET_PLAYER_9MM, 0, 10 * (flCycleTime * 10.0), m_pPlayer->pev, m_pPlayer->random_seed);
 
 	PLAYBACK_EVENT_FULL( flags, m_pPlayer->edict(), fUseAutoAim ? m_usFireGlock1 : m_usFireGlock2, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, ( m_iClip == 0 ) ? 1 : 0, 0 );
 

@@ -28,6 +28,7 @@
 #include "cbase.h"
 #include "saverestore.h"
 #include "player.h"
+#include "rooster/rf_player.h"
 #include "spectator.h"
 #include "client.h"
 #include "soundent.h"
@@ -39,6 +40,7 @@
 #include "usercmd.h"
 #include "netadr.h"
 #include "pm_shared.h"
+#include "bot/hl_bot_manager.h"	// bot framework: nav mesh lifecycle + bot thinking
 
 extern DLL_GLOBAL ULONG		g_ulModelIndexPlayer;
 extern DLL_GLOBAL BOOL		g_fGameOver;
@@ -120,6 +122,14 @@ void ClientDisconnect( edict_t *pEntity )
 		pSound->Reset();
 	}
 
+	// let the bot manager clean up after the departing player
+	if( TheHLBots )
+	{
+		CBaseEntity *pPlayer = CBaseEntity::Instance( pEntity );
+		if( pPlayer && pPlayer->IsPlayer() )
+			TheHLBots->ClientDisconnect( static_cast<CBasePlayer *>( pPlayer ) );
+	}
+
 	// since the edict doesn't get deleted, fix it so it doesn't interfere.
 	pEntity->v.takedamage = DAMAGE_NO;// don't attract autoaim
 	pEntity->v.solid = SOLID_NOT;// nonsolid
@@ -192,7 +202,7 @@ void ClientPutInServer( edict_t *pEntity )
 
 	entvars_t *pev = &pEntity->v;
 
-	pPlayer = GetClassPtr( (CBasePlayer *)pev );
+	pPlayer = GetClassPtr( (CRFPlayer*)pev );
 	pPlayer->SetCustomDecalFrames( -1 ); // Assume none;
 	pPlayer->SetPrefsFromUserinfo( g_engfuncs.pfnGetInfoKeyBuffer( pEntity ) );
 
@@ -720,6 +730,10 @@ void ServerDeactivate( void )
 
 	// Peform any shutdown operations here...
 	//
+
+	// free the navigation mesh - it is rebuilt/reloaded for the next map
+	if( TheHLBots )
+		TheHLBots->ServerDeactivate();
 }
 
 void ServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
@@ -756,6 +770,10 @@ void ServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 
 	// Link user messages here to make sure first client can get them...
 	LinkUserMessages();
+
+	// load this map's navigation mesh, if one exists
+	if( TheHLBots )
+		TheHLBots->ServerActivate();
 }
 
 /*
@@ -820,6 +838,10 @@ void StartFrame( void )
 
 	gpGlobals->teamplay = teamplay.value;
 	g_ulFrameCount++;
+
+	// think the bots, and drive nav mesh generation/editing (bot_nav_* commands)
+	if( TheHLBots )
+		TheHLBots->StartFrame();
 }
 
 void ClientPrecache( void )
@@ -931,6 +953,100 @@ void ClientPrecache( void )
 	PRECACHE_SOUND( "player/geiger3.wav" );
 	PRECACHE_SOUND( "player/geiger2.wav" );
 	PRECACHE_SOUND( "player/geiger1.wav" );
+
+	// rf2 playermodels
+	// these are technically from TFC but with tf2 models
+	// EVENTUALLY I PLAN ON PORTING ANIMATIONS DIRECTLY FROM TF2
+	// thats later on though :)))
+
+	PRECACHE_MODEL("models/rooster_fortress/player/scout/scout.mdl");
+	PRECACHE_MODEL("models/rooster_fortress/player/soldier/soldier.mdl");
+	PRECACHE_MODEL("models/rooster_fortress/player/pyro/pyro.mdl");
+	PRECACHE_MODEL("models/rooster_fortress/player/demo/demo.mdl");
+	PRECACHE_MODEL("models/rooster_fortress/player/hvyweapon/hvyweapon.mdl");
+	PRECACHE_MODEL("models/rooster_fortress/player/engineer/engineer.mdl");
+	PRECACHE_MODEL("models/rooster_fortress/player/medic/medic.mdl");
+	PRECACHE_MODEL("models/rooster_fortress/player/sniper/sniper.mdl");
+	PRECACHE_MODEL("models/rooster_fortress/player/spy/spy.mdl");
+
+	// tf2 player hurt sounds
+	PRECACHE_SOUND("rooster_fortress/player/pain1.wav");
+	PRECACHE_SOUND("rooster_fortress/player/pain2.wav");
+	PRECACHE_SOUND("rooster_fortress/player/pain3.wav");
+	PRECACHE_SOUND("rooster_fortress/player/pain4.wav");
+	PRECACHE_SOUND("rooster_fortress/player/pain5.wav");
+	PRECACHE_SOUND("rooster_fortress/player/pain6.wav");
+
+	// tf2 misc noises START
+
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_beepo.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_space.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_squasher.wav");
+
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_electro1.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_electro2.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_electro3.wav");
+
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_menu_note1.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_menu_note2.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_menu_note3.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_menu_note4.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_menu_note5.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_menu_note6.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_menu_note7.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_menu_note7b.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_menu_note8.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_menu_note9.wav");
+
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_percussion1.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_percussion2.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_percussion3.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_percussion4.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_percussion5.wav");
+
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_retro1.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_retro2.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_retro3.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_retro4.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_retro5.wav");
+
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_vortex1.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_vortex2.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_vortex3.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_vortex4.wav");
+	PRECACHE_SOUND("rooster_fortress/hitsound/hitsound_vortex5.wav");
+
+
+	PRECACHE_SOUND("rooster_fortress/killsound/killsound.wav");
+	PRECACHE_SOUND("rooster_fortress/killsound/killsound_beepo.wav");
+	PRECACHE_SOUND("rooster_fortress/killsound/killsound_electro.wav");
+	PRECACHE_SOUND("rooster_fortress/killsound/killsound_note.wav");
+	PRECACHE_SOUND("rooster_fortress/killsound/killsound_percussion.wav");
+	PRECACHE_SOUND("rooster_fortress/killsound/killsound_retro.wav");
+	PRECACHE_SOUND("rooster_fortress/killsound/killsound_space.wav");
+	PRECACHE_SOUND("rooster_fortress/killsound/killsound_squasher.wav");
+	PRECACHE_SOUND("rooster_fortress/killsound/killsound_vortex.wav");
+
+	PRECACHE_SOUND("rooster_fortress/crit_hit1.wav");
+	PRECACHE_SOUND("rooster_fortress/crit_hit2.wav");
+	PRECACHE_SOUND("rooster_fortress/crit_hit3.wav");
+	PRECACHE_SOUND("rooster_fortress/crit_hit4.wav");
+	PRECACHE_SOUND("rooster_fortress/crit_hit5.wav");
+
+	PRECACHE_SOUND("rooster_fortress/crit_hit_mini1.wav");
+	PRECACHE_SOUND("rooster_fortress/crit_hit_mini2.wav");
+	PRECACHE_SOUND("rooster_fortress/crit_hit_mini3.wav");
+	PRECACHE_SOUND("rooster_fortress/crit_hit_mini4.wav");
+	PRECACHE_SOUND("rooster_fortress/crit_hit_mini5.wav");
+
+	PRECACHE_SOUND("rooster_fortress/crit_received1.wav");
+	PRECACHE_SOUND("rooster_fortress/crit_received2.wav");
+	PRECACHE_SOUND("rooster_fortress/crit_received3.wav");
+
+	PRECACHE_SOUND("rooster_fortress/crit_shot.wav");
+
+	// tf2 misc noises END
 
 	if( giPrecacheGrunt )
 		UTIL_PrecacheOther( "monster_human_grunt" );

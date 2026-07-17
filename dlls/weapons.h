@@ -62,26 +62,49 @@ public:
 #define ITEM_SECURITY		3
 #define ITEM_BATTERY		4
 
-#define WEAPON_NONE				0
-#define WEAPON_CROWBAR			1
-#define	WEAPON_GLOCK			2
-#define WEAPON_PYTHON			3
-#define WEAPON_MP5				4
-#define WEAPON_CHAINGUN			5
-#define WEAPON_CROSSBOW			6
-#define WEAPON_SHOTGUN			7
-#define WEAPON_RPG				8
-#define WEAPON_GAUSS			9
-#define WEAPON_EGON				10
-#define WEAPON_HORNETGUN		11
-#define WEAPON_HANDGRENADE		12
-#define WEAPON_TRIPMINE			13
-#define	WEAPON_SATCHEL			14
-#define	WEAPON_SNARK			15
+enum WeaponId
+{
+	WEAPON_NONE = 0,
+	WEAPON_CROWBAR,
+	WEAPON_GLOCK,
+	WEAPON_PYTHON,
+	WEAPON_MP5,
+	WEAPON_CHAINGUN,
+	WEAPON_CROSSBOW,
+	WEAPON_SHOTGUN,
+	WEAPON_RPG,
+	WEAPON_GAUSS,
+	WEAPON_EGON,
+	WEAPON_HORNETGUN,
+	WEAPON_HANDGRENADE,
+	WEAPON_TRIPMINE,
+	WEAPON_SATCHEL,
+	WEAPON_SNARK,
+	WEAPON_SHOVEL,
+	WEAPON_SCATTERGUN,
+	WEAPON_BAT,
+	WEAPON_WRENCH,
+	WEAPON_BOTTLE,
+	WEAPON_FIREAXE,
+	WEAPON_FISTS,
+	WEAPON_BONESAW,
+	WEAPON_KUKRI,
+	WEAPON_KNIFE,
+	WEAPON_GRENADELAUNCHER,
+	WEAPON_STICKYBOMBLAUNCHER,
+	WEAPON_MINIGUN,
+	WEAPON_FLAMETHROWER,
+	WEAPON_MEDIGUN,
+	WEAPON_SMG = 32,
+	WEAPON_SAPPER,
+	WEAPON_DISGUISEKIT,
+	WEAPON_PDA,
+	WEAPON_REVOLVER,
+	WEAPON_DESTROYPDA,
+	WEAPON_ALLWEAPONS
+};
 
-#define WEAPON_ALLWEAPONS		(~(1<<WEAPON_SUIT))
-
-#define WEAPON_SUIT				31	// ?????
+#define WEAPON_SUIT 31
 
 #define MAX_NORMAL_BATTERY	100
 
@@ -92,17 +115,22 @@ public:
 #define MP5_WEIGHT			15
 #define SHOTGUN_WEIGHT		15
 #define CROSSBOW_WEIGHT		10
-#define RPG_WEIGHT			20
+#define RPG_WEIGHT			17
 #define GAUSS_WEIGHT		20
 #define EGON_WEIGHT			20
 #define HORNETGUN_WEIGHT	15
 #define HANDGRENADE_WEIGHT	5
-#define SNARK_WEIGHT		5
+#define SNARK_WEIGHT		18
 #define SATCHEL_WEIGHT		-10
 #define TRIPMINE_WEIGHT		-10
 
+// For Rooster Fortress 2 weapon weights
+#define PRIMARY_WEIGHT		20
+#define SECONDARY_WEIGHT	10
+#define MELEE_WEIGHT		5
+
 // weapon clip/carry ammo capacities
-#define URANIUM_MAX_CARRY		100
+#define URANIUM_MAX_CARRY		250
 #define	_9MM_MAX_CARRY			250
 #define _357_MAX_CARRY			36
 #define BUCKSHOT_MAX_CARRY		125
@@ -111,19 +139,37 @@ public:
 #define HANDGRENADE_MAX_CARRY	10
 #define SATCHEL_MAX_CARRY		5
 #define TRIPMINE_MAX_CARRY		5
-#define SNARK_MAX_CARRY			15
-#define HORNET_MAX_CARRY		8
+#define SNARK_MAX_CARRY			100
+#define HORNET_MAX_CARRY		100
 #define M203_GRENADE_MAX_CARRY	10
+
+// rooster fortress 2 ammo capabilities
+#define SCATTERGUN_MAX_CARRY 32
+#define ROCKERLAUNCHER_MAX_CARRY 20
+#define FLAMETHROWER_MAX_CARRY 200
+#define GRENADELAUNCHER_MAX_CARRY 16
+#define STICKYBOMB_MAX_CARRY 24
+#define SYRINGEGUN_MAX_CARRY 150
+#define SNIPERRIFLE_MAX_CARRY 25
+#define SMG_MAX_CARRY 75
+#define REVOLVER_MAX_CARRY 24
+
+#define SCATTERGUN_MAX_CLIP 6
+#define GRENADELAUNCHER_MAX_CLIP 4
+#define STICKYBOMBLAUCHER_MAX_CLIP 8
+#define REVOLVER_MAX_CLIP 6
+#define SYRINGEGUN_MAX_CLIP 40
+#define SMG_MAX_CLIP 25
 
 // the maximum amount of ammo each weapon's clip can hold
 #define WEAPON_NOCLIP			-1
 
 //#define CROWBAR_MAX_CLIP		WEAPON_NOCLIP
-#define GLOCK_MAX_CLIP			17
+#define GLOCK_MAX_CLIP			170
 #define PYTHON_MAX_CLIP			6
-#define MP5_MAX_CLIP			50
-#define SHOTGUN_MAX_CLIP		8
-#define CROSSBOW_MAX_CLIP		5
+#define MP5_MAX_CLIP			500
+#define SHOTGUN_MAX_CLIP		120
+#define CROSSBOW_MAX_CLIP		50
 #define RPG_MAX_CLIP			1
 #define GAUSS_MAX_CLIP			WEAPON_NOCLIP
 #define EGON_MAX_CLIP			WEAPON_NOCLIP
@@ -134,12 +180,12 @@ public:
 #define SNARK_MAX_CLIP			WEAPON_NOCLIP
 
 // the default amount of ammo that comes with each gun when it spawns
-#define GLOCK_DEFAULT_GIVE			17
+#define GLOCK_DEFAULT_GIVE			170
 #define PYTHON_DEFAULT_GIVE			6
 #define MP5_DEFAULT_GIVE			25
 #define MP5_DEFAULT_GIVE_MP			MP5_MAX_CLIP
 #define MP5_M203_DEFAULT_GIVE		0
-#define SHOTGUN_DEFAULT_GIVE		12
+#define SHOTGUN_DEFAULT_GIVE		120
 #define CROSSBOW_DEFAULT_GIVE		5
 #define RPG_DEFAULT_GIVE			1
 #define GAUSS_DEFAULT_GIVE			20
@@ -147,7 +193,7 @@ public:
 #define HANDGRENADE_DEFAULT_GIVE	5
 #define SATCHEL_DEFAULT_GIVE		1
 #define TRIPMINE_DEFAULT_GIVE		1
-#define SNARK_DEFAULT_GIVE			5
+#define SNARK_DEFAULT_GIVE			SNARK_MAX_CARRY
 #define HIVEHAND_DEFAULT_GIVE		8
 
 // The amount of ammo given to a player by an ammo item.
@@ -172,6 +218,9 @@ typedef	enum
 	BULLET_PLAYER_357, // python
 	BULLET_PLAYER_BUCKSHOT, // shotgun
 	BULLET_PLAYER_CROWBAR, // crowbar swipe
+
+	BULLET_PLAYER_TF2,			// compatible with crits + distance modifier
+	BULLET_PLAYER_TF2_HEADSHOT,	// no falloff + crits on headshot
 
 	BULLET_MONSTER_9MM,
 	BULLET_MONSTER_MP5,
@@ -275,7 +324,7 @@ public:
 	// int		m_iIdSecondary;										// Unique Id for secondary ammo
 };
 
-// inventory items that 
+// inventory items  that do damage and shit
 class CBasePlayerWeapon : public CBasePlayerItem
 {
 public:
@@ -372,6 +421,10 @@ extern DLL_GLOBAL	short	g_sModelIndexWExplosion;// holds the index for the under
 extern DLL_GLOBAL	short	g_sModelIndexBubbles;// holds the index for the bubbles model
 extern DLL_GLOBAL	short	g_sModelIndexBloodDrop;// holds the sprite index for blood drops
 extern DLL_GLOBAL	short	g_sModelIndexBloodSpray;// holds the sprite index for blood spray (bigger)
+
+extern DLL_GLOBAL short g_sModelIndexCriticalHit; // holds the index for the critical hit icon
+extern DLL_GLOBAL short g_sModelIndexMiniCritHit; // holds the index for the mini critical hit icon
+extern DLL_GLOBAL short g_sModelIndexPlayerOnFireFX; // holds the index for the flame effect on players when on fire
 
 extern void ClearMultiDamage(void);
 extern void ApplyMultiDamage(entvars_t* pevInflictor, entvars_t* pevAttacker );
@@ -977,19 +1030,19 @@ private:
 class CSqueak : public CBasePlayerWeapon
 {
 public:
-	void Spawn( void );
-	void Precache( void );
-	int iItemSlot( void ) { return 5; }
-	int GetItemInfo(ItemInfo *p);
+	void Spawn(void);
+	void Precache(void);
+	int iItemSlot(void) { return 5; }
+	int GetItemInfo(ItemInfo* p);
 
-	void PrimaryAttack( void );
-	void SecondaryAttack( void );
-	BOOL Deploy( void );
-	void Holster( int skiplocal = 0 );
-	void WeaponIdle( void );
+	void PrimaryAttack(void);
+	void SecondaryAttack(void);
+	BOOL Deploy(void);
+	void Holster(int skiplocal = 0);
+	void WeaponIdle(void);
 	int m_fJustThrown;
 
-	virtual BOOL UseDecrement( void )
+	virtual BOOL UseDecrement(void)
 	{
 #if CLIENT_WEAPONS
 		return TRUE;
@@ -1001,4 +1054,78 @@ public:
 private:
 	unsigned short m_usSnarkFire;
 };
+
+class CRFBasePlayerWeapon : public CBasePlayerWeapon
+{
+	// same as CBasePlayerWeapon but with some extra stuff to consolidate things between the tf2 weapons
+	// this is specifically done so that all the hl1 weapons aren't affected by stuff that only the tf2 weapons need
+
+public:
+	void Holster(int skiplocal = 0) override;
+	float m_flHolsterPercentage = 1.0; // this gets multiplied by the holster speed to determine how much time it takes
+	// 1.0 is equivalent to 0.5 seconds of holster speed, standard for tf2.
+
+	BOOL Deploy(void);
+	BOOL DefaultDeploy(const char* szWeaponModel, int iAnim, const char* szAnimExt);
+
+	float m_flDamage;		// base damage
+	float m_flAttackDelay;	// base firing rate
+	// iirc tf2 doesnt have these
+	// i am adding these two things ANYWAY bcuz trying to actually FIND THIS SHIT IN SOURCEMOD WAS ALREADY ANNOYING
+	// FUCK YOU VALVE. IT IS SO FUCKING SIMPLE BUT NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO OFC YOU JUST HARDCODE THE VARIABLES AND MAKE THEM INVISIBLE TO SOURCEMOD!!!
+	// FUCKING GENIUSES THE LOT OF U
+};
+
+class CRFBasePlayerGun : public CRFBasePlayerWeapon
+{
+	// all tf2 guns use this
+public:
+	void ShootBullets(float spread, int multishot);
+	void Precache() override;
+	int iItemSlot() override { return 1; }
+	BOOL GetItemInfo(ItemInfo* p) override;
+	unsigned short m_usRF2Ranged;
+	BOOL UseDecrement() override
+	{
+#if defined(CLIENT_WEAPONS)
+		return true;
+#else
+		return false;
+#endif
+	}
+};
+
+class CRFBasePlayerMelee : public CRFBasePlayerWeapon
+{
+	// all tf2 melees use this
+public:
+	void Precache() override;
+
+	int iItemSlot() override { return 3; }
+	BOOL GetItemInfo(ItemInfo* p) override;
+
+	void EXPORT Swing();
+
+	void PrimaryAttack() override;
+	float m_flMeleeDamage = 65.0f;
+	float m_flSwingDelay = 0.8f;
+
+	int m_iSwing;
+	TraceResult m_trHit;
+
+	int MELEE_BODYHIT_VOLUME = 128;
+	int MELEE_WALLHIT_VOLUME = 512;
+
+	unsigned short m_usMeleeWeapon;
+
+	BOOL UseDecrement() override
+	{
+#if defined(CLIENT_WEAPONS)
+		return true;
+#else
+		return false;
+#endif
+	}
+};
+
 #endif // WEAPONS_H

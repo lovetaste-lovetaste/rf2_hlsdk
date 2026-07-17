@@ -232,7 +232,8 @@ void LinkUserMessages( void )
 	gmsgStatusValue = REG_USER_MSG( "StatusValue", 3 );
 }
 
-LINK_ENTITY_TO_CLASS( player, CBasePlayer )
+LINK_ENTITY_TO_CLASS( player_old, CBasePlayer )
+// the normal player ent link is in rf_player.cpp now
 
 void CBasePlayer::Pain( void )
 {
@@ -420,8 +421,8 @@ void CBasePlayer::TraceAttack( entvars_t *pevAttacker, float flDamage, Vector ve
 	etc are implemented with subsequent calls to TakeDamage using DMG_GENERIC.
 */
 
-#define ARMOR_RATIO	0.2	// Armor Takes 80% of the damage
-#define ARMOR_BONUS	0.5	// Each Point of Armor is work 1/x points of health
+#define ARMOR_RATIO	1.0	// Armor Takes 80% of the damage
+#define ARMOR_BONUS	10.0 // Each Point of Armor is work 1/x points of health
 
 int CBasePlayer::TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType )
 {
@@ -442,7 +443,7 @@ int CBasePlayer::TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, fl
 	if( ( bitsDamageType & DMG_BLAST ) && g_pGameRules->IsMultiplayer() )
 	{
 		// blasts damage armor more.
-		flBonus *= 2;
+		flBonus *= 10;
 	}
 
 	// Already dead
@@ -1096,6 +1097,7 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 		}
 	}
 
+	// airborne leg animations go here!!!
 	if( FBitSet( pev->flags, FL_DUCKING ) )
 	{
 		if( speed == 0 )
@@ -1369,7 +1371,7 @@ void CBasePlayer::PlayerDeathThink( void )
 		return;
 
 	// wait for any button down,  or mp_forcerespawn is set and the respawn time is up
-	if( !fAnyButtonDown && !( g_pGameRules->IsMultiplayer() && forcerespawn.value > 0 && ( gpGlobals->time > ( m_fDeadTime + 5 ) ) ) )
+	if( !fAnyButtonDown && !( g_pGameRules->IsMultiplayer() && ( gpGlobals->time > ( m_fDeadTime + 5 ) ) ) )
 		return;
 
 	pev->button = 0;
@@ -1912,6 +1914,10 @@ void CBasePlayer::PreThink( void )
 		Observer_HandleButtons();
 		Observer_CheckTarget();
 		Observer_CheckProperties();
+
+		if( m_hObserverTarget != 0 && pev->iuser1 != OBS_ROAMING && pev->iuser1 != OBS_MAP_FREE )
+			UTIL_SetOrigin( pev, m_hObserverTarget->pev->origin );
+
 		pev->impulse = 0;
 		return;
 	}
@@ -3052,6 +3058,8 @@ int CBasePlayer::Save( CSave &save )
 
 	return save.WriteFields( "PLAYER", this, m_playerSaveData, ARRAYSIZE( m_playerSaveData ) );
 }
+
+
 
 //
 // Marks everything as new so the player will resend this to the hud.

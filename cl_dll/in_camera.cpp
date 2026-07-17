@@ -169,7 +169,9 @@ void DLLEXPORT CAM_Think( void )
 #endif
 	vec3_t viewangles;
 
-	if( gEngfuncs.GetMaxClients() > 1 && CL_IsThirdPerson() )
+	// Only force back to first person when cheats are off. sv_cheats gates
+	// thirdperson instead of the old hardcoded "no thirdperson in multiplayer".
+	if( gEngfuncs.pfnGetCvarFloat( "sv_cheats" ) == 0 && CL_IsThirdPerson() )
 		CAM_ToFirstPerson();
 
 	switch( (int)cam_command->value )
@@ -478,13 +480,13 @@ void CAM_OutUp( void )
 void CAM_ToThirdPerson( void )
 {
 	vec3_t viewangles;
-#if !_DEBUG
-	if( gEngfuncs.GetMaxClients() > 1 )
+
+	// Thirdperson is a cheat: require sv_cheats instead of blocking multiplayer.
+	if( gEngfuncs.pfnGetCvarFloat( "sv_cheats" ) == 0 )
 	{
-		// no thirdperson in multiplayer.
 		return;
 	}
-#endif
+
 	gEngfuncs.GetViewAngles( (float *)viewangles );
 
 	if( !cam_thirdperson )
@@ -661,7 +663,13 @@ void CAM_EndDistance( void )
 
 int DLLEXPORT CL_IsThirdPerson( void )
 {
-	return ( cam_thirdperson ? 1 : 0 ) || ( g_iUser1 && ( g_iUser2 == gEngfuncs.GetLocalPlayer()->index ) );
+	if( cam_thirdperson )
+		return 1;
+
+	// GetLocalPlayer() can be NULL during map transitions (e.g. changing level
+	// while spectating), so null-check before dereferencing ->index.
+	cl_entity_t *player = gEngfuncs.GetLocalPlayer();
+	return ( g_iUser1 && player && ( g_iUser2 == player->index ) ) ? 1 : 0;
 }
 
 void DLLEXPORT CL_CameraOffset( float *ofs )
